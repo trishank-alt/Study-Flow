@@ -1,0 +1,81 @@
+.dashboard-section {
+  margin-top: var(--space-xl);
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.dashboard-progress-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xl);
+}
+
+.dashboard-progress-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.dashboard-progress-count {
+  display: block;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.recent-sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.session-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg) !important;
+}
+
+.session-card:hover {
+  transform: none !important;
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.session-topic {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.session-subject {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.session-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: right;
+}
+
+.session-duration {
+  font-weight: 600;
+  color: var(--accent-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.session-date {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
