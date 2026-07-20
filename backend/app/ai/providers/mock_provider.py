@@ -11,8 +11,44 @@ class MockProvider(BaseLLMProvider):
         prompt_lower = prompt.lower()
         sys_lower = (system_prompt or "").lower()
 
-        # 1. Advisor Prompt (Checked early to avoid overlap with 'schedule')
-        if "advisor.md" in prompt_lower or "schedule review" in prompt_lower or "advisor" in prompt_lower:
+        # 1. Exam Extractor Prompt (Checked first to avoid conflict with 'summary')
+        if "exam paper" in prompt_lower or "extractor.md" in prompt_lower or "frequency" in prompt_lower:
+            return json.dumps({
+                "summary": "This exam paper focuses heavily on advanced data structures and algorithm analysis, specifically dynamic programming and balanced search trees.",
+                "difficulty": "hard",
+                "topics": [
+                    {
+                        "title": "Dynamic Programming",
+                        "frequency": "high",
+                        "recommended_hours": 8.0,
+                        "insight": "Appeared in 3 out of the last 4 final exam questions. Pay attention to memoization."
+                    },
+                    {
+                        "title": "Red-Black Trees",
+                        "frequency": "medium",
+                        "recommended_hours": 4.0,
+                        "insight": "Commonly tested as short-answer questions regarding tree rotations."
+                    }
+                ],
+                "important_concepts": [
+                    "Memoization vs Tabulation",
+                    "Tree Rotations",
+                    "Asymptotic Complexity"
+                ],
+                "commonly_repeated": [
+                    "Prove the time complexity of the LCS algorithm",
+                    "Perform left/right rotations on a sample BST"
+                ],
+                "missing_topics": [
+                    "Graph Algorithms",
+                    "Greedy Algorithms"
+                ],
+                "study_strategy": "1. Spend 4 hours mastering standard dynamic programming problems. 2. Practice manual tree rotations for 2 hours.",
+                "confidence": 0.98
+            })
+
+        # 2. Advisor Prompt (Checked early to avoid overlap with 'schedule')
+        elif "advisor.md" in prompt_lower or "schedule review" in prompt_lower or "advisor" in prompt_lower:
             return json.dumps({
                 "overall_status": "Moderately Balanced",
                 "insights": [
@@ -29,18 +65,34 @@ class MockProvider(BaseLLMProvider):
                 ]
             })
 
-        # 2. Study Planner Prompt
+        # 3. Study Flow Planner Prompt
         elif "schedule" in prompt_lower or "daily study minutes" in prompt_lower:
+            from datetime import datetime, date, timedelta
+            start_date_str = None
+            if "start date:" in prompt_lower:
+                try:
+                    start_date_str = prompt.split("Start date:")[1].split("\n")[0].strip()
+                except Exception:
+                    pass
+            try:
+                base_dt = datetime.strptime(start_date_str, "%Y-%m-%d").date() if start_date_str else date.today()
+            except Exception:
+                base_dt = date.today()
+
+            d0 = str(base_dt)
+            d1 = str(base_dt + timedelta(days=1))
+            d2 = str(base_dt + timedelta(days=2))
+
             return json.dumps({
                 "schedule": [
-                    {"topic_id": 1, "scheduled_date": "2026-07-20", "planned_minutes": 45},
-                    {"topic_id": 1, "scheduled_date": "2026-07-21", "planned_minutes": 45},
-                    {"topic_id": 2, "scheduled_date": "2026-07-20", "planned_minutes": 60},
-                    {"topic_id": 2, "scheduled_date": "2026-07-22", "planned_minutes": 60}
+                    {"topic_id": 1, "scheduled_date": d0, "planned_minutes": 45},
+                    {"topic_id": 1, "scheduled_date": d1, "planned_minutes": 45},
+                    {"topic_id": 2, "scheduled_date": d0, "planned_minutes": 60},
+                    {"topic_id": 2, "scheduled_date": d2, "planned_minutes": 60}
                 ]
             })
 
-        # 3. Tutor Explanation Prompt
+        # 4. Tutor Explanation Prompt
         elif "explain" in prompt_lower or "pedagogical" in prompt_lower:
             topic_title = "Selected Topic"
             if "topic title:" in prompt_lower:
@@ -66,7 +118,7 @@ class MockProvider(BaseLLMProvider):
                 ]
             })
 
-        # 4. Summarizer Prompt
+        # 5. Summarizer Prompt
         elif "summarize" in prompt_lower or "summary" in prompt_lower:
             return json.dumps({
                 "title": "Extracted Notes Summary",
@@ -78,26 +130,6 @@ class MockProvider(BaseLLMProvider):
                 "formulas": [
                     "Rule of Simplicity: Complex Code = Higher Technical Debt",
                     "Efficiency Index: T(n) = O(log n) for search operations"
-                ]
-            })
-
-        # 5. Exam Extractor Prompt
-        elif "exam paper" in prompt_lower or "extractor.md" in prompt_lower or "frequency" in prompt_lower:
-            return json.dumps({
-                "analyzed_title": "Exam Paper Analysis Report",
-                "topics": [
-                    {
-                        "title": "Dynamic Programming",
-                        "frequency": "high",
-                        "recommended_hours": 8.0,
-                        "insight": "Appeared in 3 out of the last 4 final exam questions. Pay attention to memoization."
-                    },
-                    {
-                        "title": "Red-Black Trees",
-                        "frequency": "medium",
-                        "recommended_hours": 4.0,
-                        "insight": "Commonly tested as short-answer questions regarding tree rotations."
-                    }
                 ]
             })
 
@@ -138,7 +170,7 @@ class MockProvider(BaseLLMProvider):
 
 
         # Default fallback
-        return "I am the AI study planner tutor. Please let me know how I can help you understand your topics!"
+        return "I am the AI Study Flow tutor. Please let me know how I can help you understand your topics!"
 
     async def chat(self, messages: List[Dict[str, str]]) -> str:
         last_msg = messages[-1]["content"].lower() if messages else ""

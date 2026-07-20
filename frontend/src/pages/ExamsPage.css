@@ -54,3 +54,44 @@
   font-size: var(--font-size-xs);
   color: var(--text-muted);
 }
+
+/* Status tags styling */
+.status-tag {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.status-pending {
+  background: rgba(251, 146, 60, 0.1);
+  color: var(--accent-orange);
+  border: 1px solid rgba(251, 146, 60, 0.2);
+}
+
+.status-processed {
+  background: rgba(52, 211, 153, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+.status-failed {
+  background: rgba(248, 113, 113, 0.1);
+  color: var(--accent-red);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+/* Analysis table and details */
+.analysis-table th {
+  padding: var(--space-xs) var(--space-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.analysis-table td {
+  padding: var(--space-sm);
+}
+
+.analysis-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}

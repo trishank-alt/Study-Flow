@@ -82,15 +82,25 @@ class ScheduleService:
         exam_rows = exam_result.all()
         exams = [row.Exam for row in exam_rows]
 
-        # Try generating with AI if configured
-        if settings.llm_provider != "rule-based":
+        # Determine whether to use AI or rule-based generation
+        should_use_ai = request.use_ai if request.use_ai is not None else (settings.llm_provider != "rule-based")
+
+        if should_use_ai:
             try:
                 from app.ai.service import AIService, load_prompt_template
                 from app.ai.parsers.json_parser import parse_json_markdown
                 from app.ai.models.planning_response import PlanningResponse
+                from app.ai.providers.mock_provider import MockProvider
                 from app.shared.logger import logger
 
-                logger.info(f"Generating schedule with AI provider: {settings.llm_provider}")
+                if settings.llm_provider == "rule-based":
+                    provider_to_use = MockProvider()
+                    logger.info("AI schedule requested while settings is rule-based; using MockProvider.")
+                else:
+                    ai_service = AIService(settings)
+                    provider_to_use = ai_service.provider
+
+                logger.info(f"Generating schedule with AI provider: {provider_to_use.__class__.__name__}")
 
                 topics_str = "\n".join([
                     f"- Topic ID {row.Topic.id}: {row.Topic.title} (Subject: {row.subject_name}, Difficulty: {row.Topic.difficulty}, Remaining Estimated Hours: {row.Topic.estimated_hours * (1.0 - row.Topic.completion_percentage / 100.0):.1f}h)"
@@ -102,7 +112,6 @@ class ScheduleService:
                     for row in exam_rows
                 ])
 
-                ai_service = AIService(settings)
                 template = load_prompt_template("planner.md")
                 prompt = template.format(
                     daily_study_minutes=daily_minutes,
@@ -111,33 +120,33 @@ class ScheduleService:
                     exams_data=exams_str or "No upcoming exams.",
                 )
 
-                response_text = await ai_service.provider.generate(prompt)
+                response_text = await provider_to_use.generate(prompt)
                 parsed = parse_json_markdown(response_text)
                 planning_res = PlanningResponse(**parsed)
 
-                # Clear existing schedule
-                await self.repo.delete_all_by_user(user_id)
+                valid_topic_ids = {row.Topic.id for row in topic_rows}
+                topic_id_list = [row.Topic.id for row in topic_rows]
 
-                # Save bulk schedule items
                 items_to_save = []
-                for item in planning_res.schedule:
+                for idx, item in enumerate(planning_res.schedule):
+                    target_topic_id = item.topic_id if item.topic_id in valid_topic_ids else topic_id_list[idx % len(topic_id_list)]
                     items_to_save.append({
-                        "topic_id": item.topic_id,
+                        "topic_id": target_topic_id,
                         "scheduled_date": item.scheduled_date,
-                        "planned_minutes": item.planned_minutes,
+                        "planned_minutes": max(item.planned_minutes, 15),
                     })
 
                 if items_to_save:
+                    await self.repo.delete_all_by_user(user_id)
                     await self.repo.save_bulk(items_to_save)
-
-                await self.db.flush()
-                return await self.list_schedule(user_id)
+                    await self.db.flush()
+                    return await self.list_schedule(user_id)
 
             except Exception as e:
                 from app.shared.logger import logger
                 logger.warning(f"AI schedule generation failed, falling back to rule-based schedule. Error: {str(e)}")
 
-        # Clear existing schedule for rule-based fallback
+        # Clear existing schedule for rule-based generation / fallback
         await self.repo.delete_all_by_user(user_id)
 
         # Determine the scheduling horizon

@@ -92,7 +92,10 @@ async def chat_tutor(
     settings = await settings_service.get_settings(current_user.id)
 
     ai_service = AIService(settings)
-    return await ai_service.chat_tutor(payload.messages)
+    try:
+        return await ai_service.chat_tutor(payload.messages)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/review-schedule", response_model=ScheduleReviewResponse)

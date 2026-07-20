@@ -18,7 +18,7 @@ export default function Sidebar() {
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <span className="logo-icon">🎓</span>
-          <span className="logo-text">StudyPlanner</span>
+          <span className="logo-text">Study Flow</span>
         </div>
       </div>
 

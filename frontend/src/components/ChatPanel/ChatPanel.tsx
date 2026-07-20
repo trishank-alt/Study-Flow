@@ -50,13 +50,15 @@ export default function ChatPanel() {
           content: data.reply,
         },
       ]);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
+      const axiosError = err as { response?: { data?: { detail?: string } } };
+      const detailMessage = axiosError.response?.data?.detail;
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: '⚠️ Failed to connect to the AI tutor. Please check your settings and connection.',
+          content: detailMessage ? `⚠️ ${detailMessage}` : '⚠️ Failed to connect to the AI tutor. Please check your settings and connection.',
         },
       ]);
     } finally {

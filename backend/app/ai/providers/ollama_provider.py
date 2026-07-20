@@ -4,7 +4,7 @@ from app.ai.providers.provider import BaseLLMProvider
 
 
 class OllamaProvider(BaseLLMProvider):
-    def __init__(self, model_name: str = "qwen", ollama_url: str = "http://localhost:11434"):
+    def __init__(self, model_name: str = "qwen2.5-coder:14b", ollama_url: str = "http://127.0.0.1:11434"):
         self.model_name = model_name
         self.ollama_url = ollama_url
 
@@ -23,7 +23,7 @@ class OllamaProvider(BaseLLMProvider):
             "stream": False
         }
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload, timeout=60.0)
+            response = await client.post(url, json=payload, timeout=600.0)
             response.raise_for_status()
             data = response.json()
             return data["message"]["content"]

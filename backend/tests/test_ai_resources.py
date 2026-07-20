@@ -56,6 +56,22 @@ def test_settings_flow():
     asyncio.run(run())
 
 
+def test_gemini_provider():
+    from app.ai.orchestrator import AIOrchestrator
+    from app.ai.providers.gemini_provider import GeminiProvider
+
+    provider = AIOrchestrator.get_provider("gemini", model_name="gemini-2.5-flash")
+    assert isinstance(provider, GeminiProvider)
+    assert provider.model_name == "gemini-2.5-flash"
+
+    # Test key validation error when key is absent
+    p_no_key = GeminiProvider(api_key="")
+    p_no_key.api_key = None
+    with pytest.raises(ValueError, match="Gemini API key not set"):
+        asyncio.run(p_no_key.chat([{"role": "user", "content": "hello"}]))
+
+
+
 def test_ai_tutor_and_advisor_flow():
     async def run():
         engine, Session = await setup_test_db()

@@ -101,6 +101,7 @@ export default function SettingsPage() {
                   <option value="ollama">Ollama (Local LLM)</option>
                   <option value="openai">OpenAI (Cloud API)</option>
                   <option value="anthropic">Anthropic (Cloud API)</option>
+                  <option value="gemini">Google Gemini (Cloud API)</option>
                 </select>
               </div>
 
@@ -125,7 +126,7 @@ export default function SettingsPage() {
                     className="form-input"
                     value={modelName}
                     onChange={(e) => setModelName(e.target.value)}
-                    placeholder={provider === 'ollama' ? 'e.g. qwen' : 'e.g. gpt-4o-mini'}
+                    placeholder={provider === 'ollama' ? 'e.g. qwen' : provider === 'gemini' ? 'e.g. gemini-2.5-flash' : 'e.g. gpt-4o-mini'}
                   />
                 </div>
               )}
@@ -140,6 +141,11 @@ export default function SettingsPage() {
                   ℹ️ Anthropic calls require the <code>ANTHROPIC_API_KEY</code> environment variable in your backend's <code>.env</code> file.
                 </div>
               )}
+              {provider === 'gemini' && (
+                <div className="settings-note">
+                  ℹ️ Google Gemini calls require the <code>GEMINI_API_KEY</code> (or <code>GOOGLE_API_KEY</code>) environment variable in your backend's <code>.env</code> file.
+                </div>
+              )}
 
               <button type="submit" className="btn btn-primary" disabled={isSaving} style={{ marginTop: '0.5rem' }}>
                 {isSaving ? '⏳ Saving...' : '💾 Save AI Configuration'}
@@ -152,7 +158,7 @@ export default function SettingsPage() {
             <div className="settings-about">
               <div className="settings-about-row">
                 <span className="settings-about-label">Application</span>
-                <span className="settings-about-value">Study Planner</span>
+                <span className="settings-about-value">Study Flow</span>
               </div>
               <div className="settings-about-row">
                 <span className="settings-about-label">Version</span>

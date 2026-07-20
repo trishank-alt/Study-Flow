@@ -41,7 +41,7 @@ export default function LoginPage() {
       <div className="login-card animate-fade-in">
         <div className="login-header">
           <span className="login-logo">🎓</span>
-          <h1 className="login-title">StudyPlanner</h1>
+          <h1 className="login-title">Study Flow</h1>
           <p className="login-subtitle">
             {isRegister ? 'Create your account' : 'Welcome back'}
           </p>

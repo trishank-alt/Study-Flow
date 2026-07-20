@@ -9,6 +9,6 @@ class UserSettings(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     llm_provider = Column(String(50), default="mock", nullable=False)
     model_name = Column(String(100), default="gpt-4o-mini", nullable=True)
-    ollama_url = Column(String(255), default="http://localhost:11434", nullable=True)
+    ollama_url = Column(String(255), default="http://127.0.0.1:11434", nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

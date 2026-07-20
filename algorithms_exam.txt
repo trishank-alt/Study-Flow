@@ -1,0 +1,8 @@
+Algorithms Midterm Exam
+October 2026
+
+Question 1: Dynamic Programming (LCS)
+Prove the optimal substructure property of the Longest Common Subsequence problem. Compute the LCS of "ABCD" and "ACBD" manually.
+
+Question 2: Balanced Trees
+Insert keys 10, 20, 30, 40 into an initially empty Red-Black tree. Perform rotations as necessary and draw the resulting tree indicating node colors.

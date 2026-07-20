@@ -32,11 +32,11 @@ export default function PlannerPage() {
     loadSchedule();
   }, []);
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (useAi?: boolean) => {
     setIsGenerating(true);
     setReviewData(null); // Clear previous advice
     try {
-      const data = await scheduleService.generate(dailyMinutes);
+      const data = await scheduleService.generate(dailyMinutes, undefined, useAi);
       setSchedule(data);
     } catch (err) {
       console.error(err);
@@ -84,7 +84,7 @@ export default function PlannerPage() {
             <h1 className="page-title">Study Planner</h1>
             <p className="page-subtitle">Your generated study schedule</p>
           </div>
-          <div className="planner-controls">
+          <div className="planner-controls" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <div className="planner-minutes-input">
               <label className="form-label" htmlFor="daily-minutes">Daily minutes</label>
               <input
@@ -95,16 +95,26 @@ export default function PlannerPage() {
                 step="15"
                 value={dailyMinutes}
                 onChange={(e) => setDailyMinutes(Number(e.target.value))}
-                style={{ width: '100px' }}
+                style={{ width: '90px' }}
               />
             </div>
             <button
               className="btn btn-primary"
-              onClick={handleGenerate}
+              onClick={() => handleGenerate(true)}
               disabled={isGenerating}
-              id="generate-schedule-btn"
+              id="generate-ai-schedule-btn"
+              title="Generate schedule using AI"
             >
-              {isGenerating ? '⏳ Generating...' : '🔄 Generate Schedule'}
+              {isGenerating ? '⏳ Generating...' : '🤖 Generate with AI'}
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => handleGenerate(false)}
+              disabled={isGenerating}
+              id="generate-rule-schedule-btn"
+              title="Generate schedule using rules"
+            >
+              {isGenerating ? '⏳ Generating...' : '⚙️ Rule-Based'}
             </button>
           </div>
         </div>
@@ -183,15 +193,23 @@ export default function PlannerPage() {
           <div className="empty-state">
             <div className="empty-state-icon">📅</div>
             <h3>No schedule yet</h3>
-            <p>Add subjects, topics, and exams — then generate a study plan</p>
-            <button
-              className="btn btn-primary"
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              style={{ marginTop: '1rem' }}
-            >
-              🔄 Generate Schedule
-            </button>
+            <p>Add subjects, topics, and exams — then generate a study plan using AI or rules</p>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => handleGenerate(true)}
+                disabled={isGenerating}
+              >
+                🤖 Generate with AI
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => handleGenerate(false)}
+                disabled={isGenerating}
+              >
+                ⚙️ Rule-Based Schedule
+              </button>
+            </div>
           </div>
         ) : (
           <div className="planner-timeline stagger-children">

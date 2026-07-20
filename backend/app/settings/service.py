@@ -17,7 +17,7 @@ class SettingsService:
                 user_id=user_id,
                 llm_provider="mock",
                 model_name="gpt-4o-mini",
-                ollama_url="http://localhost:11434"
+                ollama_url="http://127.0.0.1:11434"
             )
             settings = await self.repo.save(settings)
         return settings

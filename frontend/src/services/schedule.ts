@@ -7,9 +7,10 @@ export const scheduleService = {
     return data;
   },
 
-  async generate(dailyMinutes: number = 120, startDate?: string): Promise<ScheduleItem[]> {
+  async generate(dailyMinutes: number = 120, startDate?: string, useAi?: boolean): Promise<ScheduleItem[]> {
     const payload: Record<string, unknown> = { daily_study_minutes: dailyMinutes };
     if (startDate) payload.start_date = startDate;
+    if (useAi !== undefined) payload.use_ai = useAi;
     const { data } = await api.post<ScheduleItem[]>('/schedule/generate', payload);
     return data;
   },

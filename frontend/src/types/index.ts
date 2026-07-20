@@ -126,3 +126,27 @@ export interface ScheduleReviewResponse {
   warnings: string[];
   suggestions: string[];
 }
+
+export interface ExamTopicAnalysis {
+  title: string;
+  frequency: string;
+  recommended_hours: number;
+  insight: string;
+}
+
+export interface ExamPaperAnalysisResult {
+  summary: string;
+  difficulty: string;
+  topics: ExamTopicAnalysis[];
+  important_concepts: string[];
+  commonly_repeated: string[];
+  missing_topics: string[];
+  study_strategy: string;
+  confidence: number;
+}
+
+export interface ExamPaperAnalysisResponse {
+  status: string;
+  result: ExamPaperAnalysisResult | null;
+  error: string | null;
+}

@@ -1,11 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ========================================
-   Design System — Study Planner MVP1
+   Design System — Study Flow MVP1
    Dark theme with vibrant gradients
    ======================================== */
 
 :root {
+  color-scheme: dark;
+
   /* Colors — Base */
   --bg-primary: #0f0f1a;
   --bg-secondary: #161625;
@@ -270,6 +272,14 @@ a:hover {
   font-size: var(--font-size-sm);
   transition: border-color var(--transition-fast);
   outline: none;
+  color-scheme: dark;
+}
+
+select option,
+.form-select option {
+  background-color: #161625;
+  color: var(--text-primary);
+  padding: 0.5rem;
 }
 
 .form-input::placeholder {

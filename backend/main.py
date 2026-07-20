@@ -1,3 +1,10 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from backend/.env and root workspace .env
+load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,19 +35,34 @@ from app.resources.router import router as resources_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting Study Planner API...")
+    logger.info("Starting Study Flow API...")
     await create_tables()
     logger.info("Database tables created")
     yield
-    logger.info("Shutting down Study Planner API...")
+    logger.info("Shutting down Study Flow API...")
 
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+import traceback
 
 app = FastAPI(
-    title="Study Planner MVP1",
-    description="A modular study planner API",
+    title="Study Flow MVP1",
+    description="A modular study flow API",
     version="1.0.0",
     lifespan=lifespan,
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    tb = traceback.format_exc()
+    with open("app_errors.log", "a", encoding="utf-8") as f:
+        f.write(f"--- ERROR AT {exc.__class__.__name__} ---\n{tb}\n")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal Server Error: {str(exc)}"}
+    )
+
 
 # CORS configuration
 app.add_middleware(

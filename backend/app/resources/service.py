@@ -70,6 +70,7 @@ class ResourceService:
             title=title,
             filename=safe_filename,
             content_type=content_type,
+            resource_type="NOTE",
             embedding_status="pending",
         )
         resource = await self.repo.save(resource)

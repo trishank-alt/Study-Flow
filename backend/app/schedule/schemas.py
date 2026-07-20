@@ -31,3 +31,4 @@ class GenerateScheduleRequest(BaseModel):
     """Request to generate a study schedule leading up to exams."""
     daily_study_minutes: int = 120
     start_date: Optional[date] = None
+    use_ai: Optional[bool] = None

@@ -44,7 +44,7 @@ class AnthropicProvider(BaseLLMProvider):
         if system_prompt:
             payload["system"] = system_prompt
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload, headers=headers, timeout=60.0)
+            response = await client.post(url, json=payload, headers=headers, timeout=600.0)
             response.raise_for_status()
             data = response.json()
             return data["content"][0]["text"]

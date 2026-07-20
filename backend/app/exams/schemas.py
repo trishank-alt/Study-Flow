@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class ExamCreate(BaseModel):
@@ -20,3 +20,27 @@ class ExamResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ExamTopicAnalysis(BaseModel):
+    title: str
+    frequency: str
+    recommended_hours: float
+    insight: str
+
+
+class ExamPaperAnalysisResult(BaseModel):
+    summary: str
+    difficulty: str
+    topics: List[ExamTopicAnalysis]
+    important_concepts: List[str]
+    commonly_repeated: List[str]
+    missing_topics: List[str]
+    study_strategy: str
+    confidence: float
+
+
+class ExamPaperAnalysisResponse(BaseModel):
+    status: str
+    result: Optional[ExamPaperAnalysisResult] = None
+    error: Optional[str] = None
