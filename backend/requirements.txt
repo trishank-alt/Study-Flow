@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
-aiosqlite
+psycopg[binary]
 pydantic
 pydantic-settings
 python-jose[cryptography]
@@ -11,3 +11,4 @@ pytest
 pytest-asyncio
 httpx
 pypdf
+alembic

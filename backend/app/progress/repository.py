@@ -1,6 +1,6 @@
 from typing import List
-from datetime import date, timedelta
-from sqlalchemy import select, func as sa_func
+from datetime import date, datetime, timedelta, timezone
+from sqlalchemy import select, cast, Date, func as sa_func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.progress.models import StudySession
 from app.topics.models import Topic
@@ -30,7 +30,7 @@ class ProgressRepository:
         return round(total_minutes / 60.0, 1)
 
     async def get_weekly_hours(self, user_id: int) -> float:
-        week_ago = date.today() - timedelta(days=7)
+        week_ago = datetime.now(timezone.utc) - timedelta(days=7)
         stmt = (
             select(sa_func.coalesce(sa_func.sum(StudySession.duration_minutes), 0))
             .join(Topic, StudySession.topic_id == Topic.id)
@@ -43,13 +43,15 @@ class ProgressRepository:
 
     async def get_study_streak(self, user_id: int) -> int:
         """Count consecutive days with study sessions up to today."""
+        is_sqlite = self.db.bind.dialect.name == "sqlite"
+        study_date_col = sa_func.date(StudySession.completed_at) if is_sqlite else cast(StudySession.completed_at, Date)
         stmt = (
-            select(sa_func.date(StudySession.completed_at).label("study_date"))
+            select(study_date_col.label("study_date"))
             .join(Topic, StudySession.topic_id == Topic.id)
             .join(Subject, Topic.subject_id == Subject.id)
             .where(Subject.user_id == user_id)
-            .group_by(sa_func.date(StudySession.completed_at))
-            .order_by(sa_func.date(StudySession.completed_at).desc())
+            .group_by(study_date_col)
+            .order_by(study_date_col.desc())
         )
         result = await self.db.execute(stmt)
         dates = [row[0] for row in result.all()]

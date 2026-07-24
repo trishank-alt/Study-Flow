@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import BackgroundTasks
 from pypdf import PdfReader
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,7 +54,7 @@ class ResourceService:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
 
         # Avoid filename collisions by prefixing with timestamp
-        timestamp = int(datetime.utcnow().timestamp())
+        timestamp = int(datetime.now(timezone.utc).timestamp())
         safe_filename = f"{timestamp}_{filename}"
         file_path = os.path.join(UPLOAD_DIR, safe_filename)
 
@@ -143,7 +143,7 @@ class ResourceService:
 
             resource.summary = formatted_summary
             resource.embedding_status = "processed"
-            resource.processed_at = datetime.utcnow()
+            resource.processed_at = datetime.now(timezone.utc)
 
         except Exception as e:
             resource.embedding_status = "failed"

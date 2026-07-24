@@ -9,7 +9,7 @@ class ScheduleItem(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     topic_id = Column(Integer, ForeignKey("topics.id", ondelete="CASCADE"), nullable=False, index=True)
-    scheduled_date = Column(Date, nullable=False)
+    scheduled_date = Column(Date, nullable=False, index=True)
     planned_minutes = Column(Integer, nullable=False, default=60)
     completed = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -5,9 +5,13 @@ from app.shared.database import Base
 
 
 
+import os
+
 @pytest.fixture(scope="function")
 async def test_db():
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+    db_url = os.getenv("TEST_DATABASE_URL", os.getenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:"))
+    connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
+    engine = create_async_engine(db_url, echo=False, connect_args=connect_args)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 

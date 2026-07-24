@@ -5,7 +5,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     APP_NAME: str = "Study Flow MVP1"
-    DATABASE_URL: str = "sqlite+aiosqlite:///./study_planner.db"
+    DATABASE_URL: str = "postgresql+psycopg://postgres:password@localhost:5432/study_planner"
     JWT_SECRET_KEY: str = "change-this-to-a-secure-random-string-in-production"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours

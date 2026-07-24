@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from pypdf import PdfReader
 from fastapi import BackgroundTasks
 from sqlalchemy import select
@@ -33,7 +33,7 @@ class ExamPaperAnalysisService:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
 
         # Avoid filename collisions
-        timestamp = int(datetime.utcnow().timestamp())
+        timestamp = int(datetime.now(timezone.utc).timestamp())
         safe_filename = f"{timestamp}_{filename}"
         file_path = os.path.join(UPLOAD_DIR, safe_filename)
 
@@ -165,11 +165,7 @@ class ExamPaperAnalysisService:
             # Store the validated dict directly in the JSON column
             resource.analysis = validated_result.model_dump()
             resource.embedding_status = "processed"
-            try:
-                from datetime import UTC
-                resource.processed_at = datetime.now(UTC)
-            except ImportError:
-                resource.processed_at = datetime.utcnow()
+            resource.processed_at = datetime.now(timezone.utc)
 
         except Exception as e:
             resource.embedding_status = "failed"
